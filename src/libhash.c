@@ -117,6 +117,86 @@ unsigned long hash_superfast(char *input) {
 	return hash;
 }
 
+//Pearson hash, 8-bit original
+unsigned char hash_pearson(char *input) {
+	if (input == NULL) return (unsigned char)ERRVAL;
+
+	unsigned char hash = 0;
+	unsigned int len = get_input_length(input);
+
+	for (unsigned int i = 0; i<len; i++) {
+		hash = T[hash ^ input[i]];
+	}
+
+	return hash;
+}
+
+//Pearson hash, modified for 32 bit
+//it uses basically the same method with a little
+//difference: an 8-bit hash is added to the last
+//bits of 32-bit hash (the code explains better)
+unsigned long hash_pearson32(char *input) {
+	if (input == NULL) return ERRVAL;
+
+	unsigned long hash = 0;
+	unsigned int len = get_input_length(input);
+	unsigned char hashbyte = 0;
+	char j = 0;
+
+	for (unsigned int i = 0; i<len; i++) {
+		hashbyte = T[hashbyte ^ input[i]];
+		hash = hash << 8;
+		hash += hashbyte;
+	}
+
+	return hash;
+}
+
+unsigned long hash_murmur3(char *input, unsigned long seed) {
+	if (input == NULL) return ERRVAL;
+
+	unsigned long hash = seed;
+	unsigned int len = get_input_length(input);
+
+	const int nblocks = len / 4;
+	unsigned long *block = (unsigned long *)input;
+	for (unsigned int i = 0; i<nblocks; i++) {
+		unsigned long k = *block;
+		k *= MM3_C1;
+		k = (k << MM3_R1) | (k >> (32-MM3_R1));
+		k *= MM3_C2;
+
+		hash ^= k;
+		hash = ((hash << MM3_R2) | (hash >> 32-MM3_R2)) * MM3_M + MM3_N;
+	}
+
+	const char *tail = (char *)(input + 4*nblocks);
+	unsigned long th = 0UL;
+
+	switch (len & 3) {
+		case 3:
+			th ^= tail[2] << 16;
+		case 2:
+			th ^= tail[1] << 8;
+		case 1:
+			th ^= tail[0];
+	}
+
+	th *= MM3_C1;
+	th = (th << MM3_R1) | (th >> (32 - MM3_R1));
+	th *= MM3_C2;
+	hash ^= th;
+
+	hash ^= len;
+	hash ^= (hash >> 16);
+	hash *= MM3_A1;
+	hash ^= (hash >> 13);
+	hash *= MM3_A2;
+	hash ^= (hash >> 16);
+
+	return hash;
+}
+
 //just a little something
 inline char *return_rabbitlancer() {
 	return "A LOGO IS COMING SOON!";
