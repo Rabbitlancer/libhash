@@ -23,8 +23,12 @@
 #include <stdlib.h> //NULL
 
 //this stuff is internal
-
 static inline unsigned int get_input_length(char *input);
+
+//some constants (you can config them for sure)
+#define ERRVAL 0UL
+#define FNV_BASE 14695981039346656037UL
+#define FNV_MOD 1099511628211UL
 //function prototypes:
 unsigned long hash_fnv(char *input);
 unsigned long hash_fnv_plus(char *input);

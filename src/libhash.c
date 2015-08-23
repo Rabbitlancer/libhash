@@ -16,14 +16,14 @@ static inline unsigned int get_input_length(char *input) {
 
 //FNV hash (classic)
 unsigned long hash_fnv(char *input) {
-	unsigned long hash = 14695981039346656037UL;
+	unsigned long hash = FNV_BASE;
 
-	if (input == NULL) return 0UL;
+	if (input == NULL) return ERRVAL;
 
 	unsigned int len = get_input_length(input);
 
 	for (unsigned int i = 0; i<len; i++) {
-		hash *= 1099511628211UL;
+		hash *= FNV_MOD;
 		hash ^= input[i];
 	}
 
@@ -32,15 +32,15 @@ unsigned long hash_fnv(char *input) {
 
 //FNV hash (swapped ops)
 unsigned long hash_fnv_plus(char *input) {
-	unsigned long hash = 14695981039346656037UL;
+	unsigned long hash = FNV_BASE;
 
-	if (input == NULL) return 0UL;
+	if (input == NULL) return ERRVAL;
 
 	unsigned int len = get_input_length(input);
 
 	for (unsigned int i = 0; i<len; i++) {
 		hash ^= input[i];
-		hash *= 1099511628211UL;
+		hash *= FNV_MOD;
 	}
 
 	return hash;
@@ -50,7 +50,7 @@ unsigned long hash_fnv_plus(char *input) {
 unsigned long hash_jenkins(char *input) {
 	unsigned long hash = 0UL;
 
-	if (input == NULL) return 0UL;
+	if (input == NULL) return ERRVAL;
 
 	unsigned int len = get_input_length(input);
 
@@ -72,7 +72,7 @@ unsigned long hash_jenkins(char *input) {
 //this one's hell of a complex for a "simple" hash function.
 //beats me how come this one is faster than two above
 unsigned long hash_superfast(char *input) {
-	if (input == NULL) return 0UL;
+	if (input == NULL) return ERRVAL;
 
 	unsigned long hash = get_input_length(input);
 	unsigned long tmp;
